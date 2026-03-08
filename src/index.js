@@ -1,15 +1,15 @@
 import express from "express";
 import http from "http";
 
-import { matchRouter } from "./route/matches.js";
-import { attatchWebSocketServer } from "./ws/server.js";
+import { matchRouter } from "./routes/matches.js";
+import { commentaryRouter } from "./routes/commentary.js";
+import { attachWebSocketServer } from "./ws/server.js";
 import { securityMiddleware } from "./arcjet.js";
 
 const PORT = Number(process.env.PORT || 8000);
 const HOST = process.env.HOST || "0.0.0.0";
 
 const app = express();
-
 const server = http.createServer(app);
 
 app.use(express.json());
@@ -21,8 +21,9 @@ app.get("/", (req, res) => {
 app.use(securityMiddleware());
 
 app.use("/matches", matchRouter);
+app.use("/matches/:id/commentary/", commentaryRouter);
 
-const { broadcastMatchCreated } = attatchWebSocketServer(server);
+const { broadcastMatchCreated } = attachWebSocketServer(server);
 
 app.locals.broadcastMatchCreated = broadcastMatchCreated;
 
